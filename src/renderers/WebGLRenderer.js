@@ -2613,7 +2613,7 @@ function WebGLRenderer( parameters ) {
 			// @todo Instead of compiling all the materials, compile just the needed one
 			this.compile( scene, camera );
 
-			initMaterial( material, null, null );
+			initMaterial( material, scene.fog, null );
 
 			// Save transform fedback varyings
 			var varyingList = Object.keys( material.transformFeedbackVaryings );
@@ -2699,13 +2699,9 @@ function WebGLRenderer( parameters ) {
 		// Unbind Transform feedback
 
 		for ( var attributeName in target.attributes ) {
-			// var arrBuffer = new Float32Array(source.attributes[ attributeName ].array)
-			// var arrBuffer = new ArrayBuffer(source.attributes[ attributeName ].itemSize * Float32Array.BYTES_PER_ELEMENT)
-			// console.log(arrBuffer)
-			_gl.getBufferSubData(_gl.TRANSFORM_FEEDBACK_BUFFER, 0, source.attributes[ attributeName ].array)
-			// console.log(arrBuffer)
-
 			if ( varyings[ attributeName ] === undefined ) continue;
+
+			_gl.getBufferSubData(_gl.TRANSFORM_FEEDBACK_BUFFER, 0, target.attributes[ attributeName ].array)
 
 			var index = varyings[ attributeName ];
 
