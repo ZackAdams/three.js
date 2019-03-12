@@ -2601,7 +2601,7 @@ function WebGLRenderer( parameters ) {
 	 * @param {BufferGeometry} target
 	 * @param {ShaderMaterial} material
 	 */
-	this.processTransformFeedback = function ( source, target, material ) {
+	this.processTransformFeedback = function ( source, target, material, scene, camera ) {
 
 		if ( _isContextLost ) return;
 
@@ -2611,7 +2611,7 @@ function WebGLRenderer( parameters ) {
 		if ( ! program ) {
 
 			// @todo Instead of compiling all the materials, compile just the needed one
-			// this.compile( scene, camera );
+			this.compile( scene, camera );
 
 			initMaterial( material, null, null );
 
