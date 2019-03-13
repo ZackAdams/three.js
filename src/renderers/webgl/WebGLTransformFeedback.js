@@ -18,7 +18,7 @@ WebGLTransformFeedback.prototype = {
 
 	tick: function (scene, camera) {
 
-		this.renderer.processTransformFeedback( this.source, this.target, this.material, scene, camera );
+		this.renderer.processTransformFeedback( this.source, this.target, this.material, this.mesh, scene, camera );
 
 		this.mesh.geometry = this.target;
 

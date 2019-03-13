@@ -2601,19 +2601,18 @@ function WebGLRenderer( parameters ) {
 	 * @param {BufferGeometry} target
 	 * @param {ShaderMaterial} material
 	 */
-	this.processTransformFeedback = function ( source, target, material, scene, camera ) {
+	this.processTransformFeedback = function ( source, target, material, object, scene, camera ) {
 
 		if ( _isContextLost ) return;
 
 		var materialProperties = properties.get( material );
-		var program = materialProperties.program;
+	
+		// @todo Instead of compiling all the materials, compile just the needed one
+		this.compile( scene, camera );
 
-		if ( ! program ) {
+		// initMaterial( material, scene.fog, null );
 
-			// @todo Instead of compiling all the materials, compile just the needed one
-			this.compile( scene, camera );
-
-			initMaterial( material, scene.fog, null );
+		if ( ! material.varyings ) {
 
 			// Save transform fedback varyings
 			var varyingList = Object.keys( material.transformFeedbackVaryings );
@@ -2630,12 +2629,21 @@ function WebGLRenderer( parameters ) {
 
 		}
 
-		var webglProgram = materialProperties.program.program;
-		var transformFeedback = materialProperties.program.transformFeedback;
-		var programAttributes = materialProperties.program.getAttributes();
+		// state.setMaterial( material );
+		var program = setProgram(camera, scene.fog, material, object);
+		var webglProgram = program.program;
+		var transformFeedback = program.transformFeedback;
+		var programAttributes = program.getAttributes();
 		var programUniforms = materialProperties.program.getUniforms();
 		var varyings = materialProperties.varyings;
+		
+		for ( var uniformName in material.uniforms ) {
 
+			var value = material.uniforms[ uniformName ].value;
+			programUniforms.setValue( _gl, uniformName, value );
+
+		}
+		
 		state.useProgram( webglProgram );
 
 		// Create/Update WebGL buffers
@@ -2675,16 +2683,7 @@ function WebGLRenderer( parameters ) {
 			_gl.bindBufferBase( _gl.TRANSFORM_FEEDBACK_BUFFER, index, attributes.get( target.attributes[ attributeName ] ).buffer );
 
 		}
-
-		// Update uniforms
-
-		for ( var uniformName in material.uniforms ) {
-
-			var value = material.uniforms[ uniformName ].value;
-			programUniforms.setValue( _gl, uniformName, value );
-
-		}
-
+		
 		// Run
 
 		_gl.enable( _gl.RASTERIZER_DISCARD );
